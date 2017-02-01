@@ -1,4 +1,12 @@
 # Posts Per Page
 Control posts per page for all your custom post types.
 
-### WIP. 
+## Todo:
+List of tasks before release.
+
+* [x] ~~Complete the core of the plugin.~~
+* [ ] Make translatable.
+* [ ] Include POT file.
+* [ ] Test on default Wordpress themes.
+* [ ] Write and tidy up readmes.
+* [ ] Add assets (screenshots & banners).
