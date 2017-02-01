@@ -10,7 +10,7 @@
  * License: GPL2
  * Domain Path: /languages/
  *
- * Copyright 2016 Benchmark Studios Ltd.
+ * Copyright 2016 - 2017 Benchmark Studios Ltd.
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License, version 2, as
  * published by the Free Software Foundation.
@@ -25,7 +25,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @package posts-per-page
- * @author Lukas Juhas
+ * @author Benchmark Studios Ltd., Lukas Juhas
  * @version 1.0
  *
  */
@@ -40,11 +40,8 @@ define('BPPP_VERSION', '1.0');
 define('BPPP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('BPPP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('BPPP_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('BPPP_PLUGIN_DOMAIN', BPPP_PLUGIN_DOMAIN);
-define('BPPP_PLUGIN_PREFIX', BPPP_PLUGIN_DOMAIN . '_');
-
-// activation hook
-add_action('activate_' . BPPP_PLUGIN_BASENAME, 'ljmm_install');
+define('BPPP_PLUGIN_DOMAIN', 'posts-per-page');
+define('BPPP_PLUGIN_PREFIX', 'bppp' . '_');
 
 class Benchmark_Posts_Per_Page
 {
@@ -56,6 +53,7 @@ class Benchmark_Posts_Per_Page
     {
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_menu', array($this, 'manage_menus'));
+        add_action('init', array($this, 'update_options'));
 
         // make sure we modify queries on front end only
         if (!is_admin()) {
@@ -91,12 +89,14 @@ class Benchmark_Posts_Per_Page
      * @since 1.0
      */
     public function settings_page()
-    { ?>
+    {
+        ?>
     		<div class="wrap">
     		  <h2><?php _e('Posts Per Page', 'pbbb'); ?></h2>
 
     		  <form method="post" action="options.php">
     		      <?php settings_fields(BPPP_PLUGIN_DOMAIN); ?>
+              <?php do_settings_sections(BPPP_PLUGIN_DOMAIN); ?>
     		      <table class="form-table">
                   <tr>
                       <th scope="row"><label for="posts_per_page">Blog pages show at most</label></th>
@@ -105,14 +105,19 @@ class Benchmark_Posts_Per_Page
                           <p class="description">Please note this option is in sync with one in the <a href="/wp-admin/options-reading.php">reading options</a>.</p>
                       </td>
                   </tr>
-                  <?php foreach ($this->get_posttypes() as $post_type) : ?>
+                  <?php if($this->get_posttypes()) : ?>
                       <tr>
-                          <th scope="row"><label for="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>"><?php echo ucwords(str_replace('_', ' ', $post_type)); ?></label></th>
-                          <td>
-                              <input name="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" type="number" step="1" min="1" id="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" value="<?php echo get_option(BPPP_PLUGIN_PREFIX . $post_type); ?>" class="small-text"> posts
-                          </td>
+                          <th><h4>Custom Post Types:</h4></th>
                       </tr>
-                  <?php endforeach; ?>
+                      <?php foreach ($this->get_posttypes() as $post_type) : ?>
+                          <tr>
+                              <th scope="row"><label for="<?php echo BPPP_PLUGIN_PREFIX . $post_type; ?>"><?php echo ucwords(str_replace('_', ' ', $post_type)); ?></label></th>
+                              <td>
+                                  <input name="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" type="number" step="1" min="1" id="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" value="<?php echo get_option(BPPP_PLUGIN_PREFIX . $post_type); ?>" class="small-text"> posts
+                              </td>
+                          </tr>
+                      <?php endforeach; ?>
+                  <?php endif; ?>
     		      </table>
     		      <?php submit_button(); ?>
     		  </form>
@@ -137,6 +142,7 @@ class Benchmark_Posts_Per_Page
      */
     public function posts_per_page($query)
     {
+        // validate query
         if (is_admin() || ! $query->is_main_query()) {
             return;
         }
@@ -149,6 +155,33 @@ class Benchmark_Posts_Per_Page
 
         // return query
         return $query;
+    }
+
+    /**
+     * update options
+     * @since 1.0
+     */
+    public function update_options()
+    {
+        // validate nonce field
+        if (! isset($_POST['_wpnonce']) || ! wp_verify_nonce($_POST['_wpnonce'], BPPP_PLUGIN_DOMAIN . '-options')) {
+            return false;
+        }
+
+        extract($_POST);
+
+        // We need to "manually" update posts_per_page option as this will not be
+        // automatically updated by submiting form to options.php:
+        //
+        // "For existing options `$autoload` can only be updated using
+        // `update_option()` if `$value` is also changed. Accepts
+        // 'yes' or true to enable, 'no' or false to disable.
+        // For non-existent options, the default value is 'yes'.
+        if (isset($posts_per_page)) {
+            update_option('posts_per_page', $posts_per_page);
+        }
+
+        // don't do anything, let the other options update.
     }
 }
 
