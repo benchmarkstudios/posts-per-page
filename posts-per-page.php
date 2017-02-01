@@ -55,6 +55,8 @@ class Benchmark_Posts_Per_Page
         add_action('admin_menu', array($this, 'manage_menus'));
         add_action('init', array($this, 'update_options'));
 
+        add_filter('plugin_action_links_' . BPPP_PLUGIN_BASENAME, array($this, 'action_links'));
+
         // make sure we modify queries on front end only
         if (!is_admin()) {
             add_filter('pre_get_posts', array($this, 'posts_per_page'));
@@ -138,6 +140,18 @@ class Benchmark_Posts_Per_Page
     {
         // add menu pages
         add_submenu_page('options-general.php', __('Posts Per Page', BPPP_PLUGIN_DOMAIN), __('Posts Per Page', BPPP_PLUGIN_DOMAIN), 'manage_options', 'ppp-settings', array($this, 'settings_page'));
+    }
+
+    /**
+     * plugin action links
+     *
+     * @since 1.0
+    */
+    public function action_links($links)
+    {
+        $links[] = '<a href="'. get_admin_url(null, 'options-general.php?page=ppp-settings') .'">'._x('Settings', 'Plugin Settings link', BPPP_PLUGIN_DOMAIN).'</a>';
+        $links[] = '<a target="_blank" href="http://benchmark.co.uk/contact-us/">'._x('Support', 'Plugin Support link', BPPP_PLUGIN_DOMAIN).'</a>';
+        return $links;
     }
 
     /**
