@@ -5,7 +5,7 @@ Control posts per page for all your custom post types.
 List of tasks before release.
 
 * [x] ~~Complete the core of the plugin.~~
-* [ ] Make translatable.
+* [x] ~~Make translatable.~~
 * [ ] Include POT file.
 * [ ] Test on default Wordpress themes.
 * [ ] Write and tidy up readmes.

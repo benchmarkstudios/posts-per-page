@@ -92,28 +92,32 @@ class Benchmark_Posts_Per_Page
     {
         ?>
     		<div class="wrap">
-    		  <h2><?php _e('Posts Per Page', 'pbbb'); ?></h2>
+    		  <h2><?php _e('Posts Per Page', BPPP_PLUGIN_DOMAIN); ?></h2>
 
     		  <form method="post" action="options.php">
     		      <?php settings_fields(BPPP_PLUGIN_DOMAIN); ?>
               <?php do_settings_sections(BPPP_PLUGIN_DOMAIN); ?>
     		      <table class="form-table">
                   <tr>
-                      <th scope="row"><label for="posts_per_page">Blog pages show at most</label></th>
+                      <th scope="row"><label for="posts_per_page"><?php _e('Blog pages show at most', BPPP_PLUGIN_DOMAIN); ?></label></th>
                       <td>
-                          <input name="posts_per_page" type="number" step="1" min="1" id="posts_per_page" value="<?php echo get_option('posts_per_page') ?>" class="small-text"> posts
-                          <p class="description">Please note this option is in sync with one in the <a href="/wp-admin/options-reading.php">reading options</a>.</p>
+                          <input name="posts_per_page" type="number" step="1" min="1" id="posts_per_page" value="<?php echo get_option('posts_per_page') ?>" class="small-text"> <?php _e('posts', BPPP_PLUGIN_DOMAIN); ?>
+                          <p class="description"><?php _e('Please note this option is in sync with one in the <a href="/wp-admin/options-reading.php">reading options</a>', BPPP_PLUGIN_DOMAIN); ?>.</p>
                       </td>
                   </tr>
-                  <?php if($this->get_posttypes()) : ?>
+                  <?php if ($this->get_posttypes()) : ?>
                       <tr>
-                          <th><h4>Custom Post Types:</h4></th>
+                          <th><h4><?php _e('Custom Post Types', BPPP_PLUGIN_DOMAIN); ?>:</h4></th>
                       </tr>
                       <?php foreach ($this->get_posttypes() as $post_type) : ?>
                           <tr>
-                              <th scope="row"><label for="<?php echo BPPP_PLUGIN_PREFIX . $post_type; ?>"><?php echo ucwords(str_replace('_', ' ', $post_type)); ?></label></th>
+                              <th scope="row">
+                                  <label for="<?php echo BPPP_PLUGIN_PREFIX . $post_type; ?>">
+                                      <?php _e(ucwords(str_replace('_', ' ', $post_type)), BPPP_PLUGIN_DOMAIN); ?>
+                                  </label>
+                              </th>
                               <td>
-                                  <input name="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" type="number" step="1" min="1" id="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" value="<?php echo get_option(BPPP_PLUGIN_PREFIX . $post_type); ?>" class="small-text"> posts
+                                  <input name="<?php echo BPPP_PLUGIN_PREFIX ?><?php echo $post_type; ?>" type="number" step="1" min="1" id="<?php echo BPPP_PLUGIN_PREFIX; ?><?php echo $post_type; ?>" value="<?php echo get_option(BPPP_PLUGIN_PREFIX . $post_type); ?>" class="small-text"> <?php _e('posts', BPPP_PLUGIN_DOMAIN); ?>
                               </td>
                           </tr>
                       <?php endforeach; ?>
@@ -133,7 +137,7 @@ class Benchmark_Posts_Per_Page
     public function manage_menus()
     {
         // add menu pages
-        add_submenu_page('options-general.php', 'Posts Per Page', 'Posts Per Page', 'manage_options', 'ppp-settings', array($this, 'settings_page'));
+        add_submenu_page('options-general.php', __('Posts Per Page', BPPP_PLUGIN_DOMAIN), __('Posts Per Page', BPPP_PLUGIN_DOMAIN), 'manage_options', 'ppp-settings', array($this, 'settings_page'));
     }
 
     /**
