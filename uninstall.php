@@ -11,6 +11,11 @@ if (! defined('WP_UNINSTALL_PLUGIN')) {
 */
 function bppp_delete_plugin()
 {
-    delete_option('optionnamehere');
+    foreach (get_post_types(['public' => true, '_builtin' => false ]) as $post_type) {
+        delete_option(BPPP_PLUGIN_PREFIX . $post_type);
+
+        // for site options in Multisite
+        delete_site_option($option_name);
+    }
 }
 bppp_delete_plugin();
